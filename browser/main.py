@@ -6,6 +6,13 @@ def log(*args, **kwargs):
     print("\033[94m", *args, "\033[0m", **kwargs)
 
 
+class Response:
+    def __init__(self, status: str, headers: dict[str, str], body: str) -> None:
+        self.status = status
+        self.headers = headers
+        self.body = body
+
+
 class URL:
     port: int | None
 
@@ -19,9 +26,13 @@ class URL:
         self.host, url = url.split("/", 1)
         self.path = "/" + url
 
-        self.port = None
+        if ":" in self.host:
+            self.host, port = self.host.split(":", 1)
+            self.port = int(port)
+        else:
+            self.port = None
 
-    def request(self) -> str:
+    def request(self) -> Response:
         s = socket.socket(
             family=socket.AF_INET,
             type=socket.SOCK_STREAM,
@@ -66,7 +77,11 @@ class URL:
         body = response.read()
         s.close()
 
-        return body
+        return Response(
+            status=status,
+            body=body,
+            headers=response_headers,
+        )
 
 
 class Browser:
@@ -92,4 +107,6 @@ class Browser:
 
 browser = Browser()
 
-browser.load("https://browser.engineering/http.html")
+# browser.load("https://browser.engineering/http.html")
+browser.load("https://browser.engineering/examples/example1-simple.html")
+# browser.load("http://localhost:8000/")
