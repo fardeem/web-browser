@@ -2,8 +2,8 @@ import socket
 import ssl
 
 
-def log(*args, **kwargs):
-    print("\033[94m", *args, "\033[0m", **kwargs)
+def log(*args: str) -> None:
+    print("\033[94m", *args, "\033[0m")
 
 
 class Response:
@@ -92,7 +92,7 @@ class Browser:
         parsed_url = URL(url)
         response = parsed_url.request()
 
-        self.show(response)
+        self.show(response.body)
 
     def show(self, body: str) -> None:
         in_tag = False
