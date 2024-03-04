@@ -1,6 +1,10 @@
 import socket
 
 
+def log(*args, **kwargs):
+    print("\033[94m", *args, "\033[0m", **kwargs)
+
+
 class URL:
     def __init__(self, url: str):
         self.scheme, url = url.split("://", 1)
@@ -21,17 +25,21 @@ class URL:
 
         s.connect((self.host, 80))
 
-        s.send(
-            (
-                "GET {} HTTP/1.0\r\n".format(self.path)
-                + "Host: {}\r\n\r\n".format(self.host)
-            ).encode("utf8")
-        )
+        http_request = "GET {} HTTP/1.0\r\n".format(
+            self.path
+        ) + "Host: {}\r\n\r\n".format(self.host)
+
+        log("Requesting to", self.host)
+        # We need to be sending bytes so we encode it here
+        s.send(http_request.encode("utf8"))
 
         response = s.makefile("r", encoding="utf8", newline="\r\n")
 
         statusline = response.readline()
         version, status, explanation = statusline.split(" ", 2)
+
+        log("Response")
+        log(f"Version: {version}, Status: {status}, Explanation: {explanation}")
 
         response_headers = {}
         while True:
@@ -73,4 +81,4 @@ class Browser:
 
 browser = Browser()
 
-browser.load("http://example.org/")
+browser.load("http://browser.engineering/http.html")
