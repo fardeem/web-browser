@@ -1,4 +1,5 @@
 import socket
+import ssl
 
 
 def log(*args, **kwargs):
@@ -6,15 +7,19 @@ def log(*args, **kwargs):
 
 
 class URL:
+    port: int | None
+
     def __init__(self, url: str):
         self.scheme, url = url.split("://", 1)
-        assert self.scheme == "http"
+        assert self.scheme in ["http", "https"]
 
         if "/" not in url:
             url = url + "/"
 
         self.host, url = url.split("/", 1)
         self.path = "/" + url
+
+        self.port = None
 
     def request(self) -> str:
         s = socket.socket(
@@ -23,7 +28,13 @@ class URL:
             proto=socket.IPPROTO_TCP,
         )
 
-        s.connect((self.host, 80))
+        port = self.port if self.port else 80 if self.scheme == "http" else 443
+
+        s.connect((self.host, port))
+
+        if self.scheme == "https":
+            ctx = ssl.create_default_context()
+            s = ctx.wrap_socket(s, server_hostname=self.host)
 
         http_request = "GET {} HTTP/1.0\r\n".format(
             self.path
@@ -81,4 +92,4 @@ class Browser:
 
 browser = Browser()
 
-browser.load("http://browser.engineering/http.html")
+browser.load("https://browser.engineering/http.html")
