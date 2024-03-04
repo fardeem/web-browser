@@ -1,0 +1,8 @@
+install:
+	uv pip install -r requirements.txt
+
+activate:
+	source .venv/bin/activate
+
+lint:
+	ruff check .
