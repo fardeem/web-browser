@@ -1,7 +1,7 @@
 from browser.main import URL
 
 
-def test_example_request():
+def test_example_request() -> None:
     url = "http://example.org"
 
     response = URL(url).request()
@@ -10,7 +10,7 @@ def test_example_request():
     assert "Example Domain" in response.body
 
 
-def test_https():
+def test_https() -> None:
     url = "https://browser.engineering/examples/example1-simple.html"
 
     response = URL(url).request()
