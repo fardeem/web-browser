@@ -137,12 +137,20 @@ class Browser:
         pass
 
     def load(self, url: str) -> None:
+        should_view_source = url.startswith("view-source:")
+
+        if url.startswith("view-source:"):
+            url = url.replace("view-source:", "")
+
         parsed_url = URL(url)
         response = parsed_url.request()
 
-        self.show(response.body)
+        if should_view_source:
+            self._show_html(response.body)
+        else:
+            self._show(response.body)
 
-    def show(self, body: str) -> None:
+    def _show(self, body: str) -> None:
         in_tag = False
         for c in body:
             if c == "<":
@@ -152,9 +160,12 @@ class Browser:
             elif not in_tag:
                 print(c, end="")
 
+    def _show_html(self, body: str) -> None:
+        print(body)
+
 
 browser = Browser()
 
 # browser.load("https://browser.engineering/http.html")
-browser.load("https://browser.engineering/examples/example1-simple.html")
+browser.load("view-source:https://browser.engineering/examples/example1-simple.html")
 # browser.load("http://localhost:8000/")
