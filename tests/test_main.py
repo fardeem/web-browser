@@ -31,6 +31,4 @@ def test_local_files() -> None:
 
     response = URL(url).request()
 
-    assert response.status == "200"
-
     assert response.body == "hello world"

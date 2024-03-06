@@ -1,5 +1,6 @@
 import socket
 import ssl
+from typing import Optional
 
 
 def log(*args: str) -> None:
@@ -7,9 +8,14 @@ def log(*args: str) -> None:
 
 
 class Response:
-    def __init__(self, status: str, headers: dict[str, str], body: str) -> None:
+    def __init__(
+        self,
+        body: str,
+        status: Optional[str] = None,
+        headers: Optional[dict[str, str]] = None,
+    ) -> None:
         self.status = status
-        self.headers = headers
+        self.headers = headers if headers is not None else {}
         self.body = body
 
 
@@ -101,15 +107,11 @@ class URL:
                 body = f.read()
 
             return Response(
-                status="200",
                 body=body,
-                headers={},
             )
         except:
             return Response(
-                status="500",
                 body="",
-                headers={},
             )
 
 
