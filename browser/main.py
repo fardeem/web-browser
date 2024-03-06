@@ -18,7 +18,7 @@ class URL:
 
     def __init__(self, url: str):
         self.scheme, url = url.split("://", 1)
-        assert self.scheme in ["http", "https"]
+        assert self.scheme in ["http", "https", "file"]
 
         if "/" not in url:
             url = url + "/"
@@ -33,6 +33,9 @@ class URL:
             self.port = None
 
     def request(self) -> Response:
+        if self.scheme == "file":
+            return self._open_file()
+
         s = socket.socket(
             family=socket.AF_INET,
             type=socket.SOCK_STREAM,
@@ -90,6 +93,24 @@ class URL:
             body=body,
             headers=response_headers,
         )
+
+    # private class method open file
+    def _open_file(self) -> Response:
+        try:
+            with open(self.path, "r") as f:
+                body = f.read()
+
+            return Response(
+                status="200",
+                body=body,
+                headers={},
+            )
+        except:
+            return Response(
+                status="500",
+                body="",
+                headers={},
+            )
 
 
 class Browser:

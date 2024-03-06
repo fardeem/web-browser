@@ -1,3 +1,5 @@
+import os
+
 from browser.main import URL
 
 
@@ -20,3 +22,15 @@ def test_https() -> None:
     assert "This is a simple" in response.body
     assert "web page with some" in response.body
     assert "text in it." in response.body
+
+
+def test_local_files() -> None:
+    project_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    print(project_directory)
+    url = f"file://{project_directory}/tests/test_files/hello.txt"
+
+    response = URL(url).request()
+
+    assert response.status == "200"
+
+    assert response.body == "hello world"
