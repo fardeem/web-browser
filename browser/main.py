@@ -47,9 +47,17 @@ class URL:
             ctx = ssl.create_default_context()
             s = ctx.wrap_socket(s, server_hostname=self.host)
 
-        http_request = "GET {} HTTP/1.0\r\n".format(
-            self.path
-        ) + "Host: {}\r\n\r\n".format(self.host)
+        request_headers = {
+            "Host": self.host,
+            "Connection": "close",
+            "User-Agent": "fardeems-browser",
+        }
+
+        http_request = (
+            "GET {} HTTP/1.0\r\n".format(self.path)
+            + "\n".join([f"{key}: {value}" for key, value in request_headers.items()])
+            + "\r\n\r\n"
+        )
 
         log("Requesting to", self.host)
         # We need to be sending bytes so we encode it here
