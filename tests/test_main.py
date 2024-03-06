@@ -32,3 +32,12 @@ def test_local_files() -> None:
     response = URL(url).request()
 
     assert response.body == "hello world"
+
+
+def test_data_scheme() -> None:
+    url = "data:text/plain,hello world"
+
+    response = URL(url).request()
+
+    assert response.headers.get("Content-Type") == "text/plain"
+    assert response.body == "hello world"

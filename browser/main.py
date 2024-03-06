@@ -23,6 +23,12 @@ class URL:
     port: int | None
 
     def __init__(self, url: str):
+        if url.startswith("data:"):
+            self.scheme = "data"
+            self.host = ""
+            self.path = url.replace("data:", "")
+            return
+
         self.scheme, url = url.split("://", 1)
         assert self.scheme in ["http", "https", "file"]
 
@@ -41,6 +47,9 @@ class URL:
     def request(self) -> Response:
         if self.scheme == "file":
             return self._open_file()
+
+        if self.scheme == "data":
+            return self._data_scheme()
 
         s = socket.socket(
             family=socket.AF_INET,
@@ -113,6 +122,14 @@ class URL:
             return Response(
                 body="",
             )
+
+    def _data_scheme(self) -> Response:
+        content_type, body = self.path.split(",", 1)
+
+        return Response(
+            body=body,
+            headers={"Content-Type": content_type},
+        )
 
 
 class Browser:
